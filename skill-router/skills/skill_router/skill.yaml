@@ -1,0 +1,36 @@
+name: skill-router
+version: "1.0.0"
+description: >
+  Interface skill for a skill library of arbitrary size. Only this skill's
+  name+description need to be held in a model's context; every other skill
+  is indexed (not loaded) in SQLite and fetched on demand via the
+  skillrouter CLI/API. Consolidated single binary: register, index, search,
+  fetch, stats, graveyard, deprecate, archive, interactive shell, HTTP API.
+  Stdlib + statically-linked SQLite amalgamation only - zero runtime
+  dependencies. Builds natively on Linux and cross-compiles to a genuine,
+  Wine-verified Windows .exe.
+type: cognitive
+entrypoint: main.cpp
+build: Makefile
+outputs:
+  binary_linux: skillrouter
+  binary_windows: skillrouter.exe
+protocol:
+  search: "skillrouter search \"<query>\" [--top N] [--json]"
+  fetch: "skillrouter fetch <skill_id> [--context \"<query>\"]"
+inputs:
+  - name: db_path
+    type: string
+    required: false
+    default: "skill_index.db"
+    description: "SQLite index file (--db flag on every subcommand)."
+permissions:
+  - type: fs.read
+    value: "{db_path}"
+  - type: fs.read
+    value: "skill library root (indexed SKILL.md paths)"
+  - type: fs.write
+    value: "{db_path}"
+  - type: net
+    value: "127.0.0.1:*"
+    description: "serve subcommand binds loopback only; no external network access."

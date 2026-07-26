@@ -1,0 +1,3 @@
+*.zip binary
+skill-router/third_party/sqlite3.c -whitespace
+skill-router/third_party/sqlite3.h -whitespace

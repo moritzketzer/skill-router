@@ -1,0 +1,20 @@
+# Build output
+skill-router/build/
+skill-router/dist/
+skill-router/*.obj
+skill-router/*.exe
+skill-router/*.pdb
+skill-router/*.ilk
+
+# Runtime state
+skill-router/*.db
+skill-router/*.db-wal
+skill-router/*.db-shm
+skill-router/skill_library/
+
+# Local and editor files
+.vscode/
+.idea/
+*.user
+*.suo
+Thumbs.db
