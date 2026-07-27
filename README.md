@@ -12,6 +12,19 @@
 
 Skill Router keeps one small interface skill in context and leaves the full skill library on disk. It indexes only metadata in SQLite. During normal agent use, the routing loop happens automatically: intent is converted into a bounded search, a ranked skill is selected, and only that skill's full body is loaded into context.
 
+## One executable, four operating modes
+
+The same `skillrouter.exe` contains the router, interactive shell, CLI, HTTP API, and MCP server. All modes use the same SQLite index, lifecycle state, deterministic ranking, and telemetry.
+
+| Mode | Start command | Intended use | User interaction |
+|---|---|---|---|
+| **Automatic agent routing (MCP)** | `skillrouter.exe mcp --db .\skill_index.db` | An MCP-capable agent searches, selects, and fetches skills while completing the user's normal task | **None for routing:** the user only states the task |
+| **Interactive live shell** | `skillrouter.exe` | Human-operated REPL with live skill-state counts, telemetry, recent events, search, fetch, and library administration | Direct interactive use |
+| **Command-line interface** | `skillrouter.exe <command>` | Scripts, CI, diagnostics, smoke tests, indexing, and administration | Direct or automated |
+| **Loopback HTTP API** | `skillrouter.exe serve --db .\skill_index.db --port 8090` | Trusted local tools and custom integrations | Determined by the calling application |
+
+Running `skillrouter.exe` with **no arguments** opens the interactive shell. Running `skillrouter.exe --help` prints the scripting and subcommand reference.
+
 ## Why it exists
 
 Large agent installations can contain hundreds or thousands of specialized skills. Injecting every skill description and body into every prompt is slow, expensive, and noisy. Skill Router reverses that model:
@@ -28,7 +41,8 @@ Search output stays bounded by `--top`; it does not grow with the size of the li
 ## Highlights
 
 - Automatic intent-to-skill routing with no user selection step
-- One portable Windows x64 executable
+- Interactive live shell by launching `skillrouter.exe` with no arguments
+- One portable Windows x64 executable containing every interface
 - Local-first operation with no remote service dependency
 - SQLite FTS5 full-text search with Porter stemming
 - Exact, fuzzy, FTS, and hybrid ranking modes
@@ -62,13 +76,27 @@ Index the library once:
 powershell -ExecutionPolicy Bypass -File .\index-skills.ps1
 ```
 
-Then connect `skillrouter.exe mcp` to the agent and keep only the included `skill-router` interface skill in the agent's always-loaded context. From that point, routing is automatic from the user's perspective: the user asks for the underlying task, and the agent performs search, selection, and fetch internally.
+### Option A: automatic agent routing
+
+Connect the MCP server to the agent and keep only the included `skill-router` interface skill in the agent's always-loaded context. From that point, routing is automatic from the user's perspective: the user asks for the underlying task, and the agent performs search, selection, and fetch internally.
 
 ```powershell
 .\skillrouter.exe mcp --db .\skill_index.db
 ```
 
-The following CLI commands are optional manual diagnostics and smoke tests; users do not need to run them during normal agent operation:
+### Option B: interactive shell
+
+Launch the executable with no arguments:
+
+```powershell
+.\skillrouter.exe
+```
+
+This opens an interactive REPL with a live status and event dashboard. It shows skills by lifecycle state, usage telemetry, and the recent search/fetch event stream while exposing search, fetch, indexing, statistics, graveyard, and administrative operations from one session.
+
+### Option C: CLI and automation
+
+The same executable exposes individual commands for scripts, CI, diagnostics, and smoke tests:
 
 ```powershell
 .\skillrouter.exe search "windows cpp build" --top 5 --json
@@ -97,7 +125,25 @@ Router fetches only that SKILL.md body
 Agent continues the original task
 ```
 
-There is no user-facing skill browser or per-task selection prompt in the normal path. Search and fetch are internal agent operations exposed through MCP, CLI, or HTTP for integration and observability.
+There is no user-facing skill browser or per-task selection prompt in the normal automatic-routing path. Search and fetch are internal agent operations exposed through MCP. The interactive shell, CLI, and HTTP API remain available for direct use, integration, administration, and observability.
+
+## Interactive shell
+
+Run the executable without a subcommand:
+
+```powershell
+.\skillrouter.exe
+```
+
+The live shell provides:
+
+- an interactive search-and-fetch workflow;
+- skill counts grouped by lifecycle state;
+- search, suggestion, fetch, and graveyard telemetry;
+- a tail of recent search/fetch events refreshed at each prompt;
+- library indexing and administrative commands without restarting the process.
+
+Use `skillrouter.exe --help` when command-oriented scripting output is preferred.
 
 ## Search modes
 
