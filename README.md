@@ -122,7 +122,6 @@ The packager initializes the Visual Studio toolchain, builds SQLite with FTS5, r
 .
 |-- README.md
 |-- LICENSE
-|-- SECURITY.md
 |-- releases/
 |   |-- SHA256SUMS.txt
 |   `-- skill-router-windows-x64-1.0.0.zip
@@ -150,8 +149,6 @@ The packager initializes the Visual Studio toolchain, builds SQLite with FTS5, r
 - Skill bodies are data, not executable code, but downstream agents must still treat third-party skill instructions as untrusted.
 - Database files and indexed skill directories should come from trusted sources.
 - The binary is not Authenticode-signed; use the published SHA-256 digest.
-
-See [SECURITY.md](SECURITY.md) for reporting and deployment guidance.
 
 ## Documentation
 
