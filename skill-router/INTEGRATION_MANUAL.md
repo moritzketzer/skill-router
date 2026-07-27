@@ -327,7 +327,7 @@ third-party JSON library, to hold the stdlib-first, single-dependency line.
 - **SESSION_END** - re-run `index` to pick up drift, then `stats` +
   `graveyard` for operator review.
 
-Run it: `python3 harness_demo.py` - indexes the centralized 32-skill
+Run it: `python3 harness_demo.py` - indexes the centralized
 `skill_library` (this project's own real skill descriptions), runs 3 simulated
 turns,
 and prints exactly what would be injected into context at each stage plus
@@ -335,10 +335,10 @@ the final telemetry/graveyard report.
 
 ## 11. Empirical proof of the core property
 
-Measured on the centralized 32-skill `skill_library/` (this project's own real
+Measured on the centralized  `skill_library/` (this project's own real
 skill descriptions, plus the `skill_router` interface skill itself):
 
-- Total bytes across all 32 skill bodies: **19,117**
+- Total bytes across all skill bodies: **19,117**
 - Bytes returned by one `search --top 1` call (name+description+score only): **230**
 - Ratio: **1.20%** of full-library size - and this ratio *shrinks further*
   as the library grows, since `search` output size depends only on `--top`,
@@ -416,7 +416,7 @@ skill_router/                 (the project directory)
   Makefile                 native + `make windows` cross-compile target
   third_party/
     sqlite3.h / sqlite3.c  vendored amalgamation (only dependency, bundled)
-  skill_library/           the centralized library - every skill in one folder (32 total)
+    skill_library/                the centralized library - every skill in one folder
     README.md              in-folder docs: SKILL.md format + how any agent augments itself
     skill_router/          the interface skill, indexed like any other + its extended manifest
       SKILL.md
