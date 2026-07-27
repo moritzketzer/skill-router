@@ -100,6 +100,8 @@ Requirements:
 - Visual Studio 2022 C++ Build Tools
 - PowerShell 5.1 or later
 
+> **Note:** The requirements above are for the provided MSVC build path used to produce the official Windows x64 release. The source itself (`main.cpp`, `skill_library.hpp`, `mcp_server.hpp`) has no Windows-specific dependencies and can be built for other platforms (e.g. Linux, macOS) with an appropriate C++20 toolchain and your own build script; only `build_windows_msvc.bat` and `package-windows.ps1` are Windows-specific.
+
 Build and test from a Visual Studio x64 Developer Command Prompt:
 
 ```powershell
