@@ -106,23 +106,23 @@ The same executable exposes individual commands for scripts, CI, diagnostics, an
 
 ## Automatic routing flow
 
-```text
-User task
-   |
-   v
-Agent recognizes that specialized capability may help
-   |
-   v
-skill-router interface invokes bounded metadata search
-   |
-   v
-Agent selects the best-ranked eligible skill
-   |
-   v
-Router fetches only that SKILL.md body
-   |
-   v
-Agent continues the original task
+```mermaid
+flowchart TD
+    U["User gives the agent a normal task"] --> A["Agent evaluates whether specialized capability may help"]
+
+    subgraph R["Automatic routing inside the agent — no user selection step"]
+        A -->|"Yes"| I["Invoke the skill-router interface through MCP"]
+        I --> S["Search bounded SQLite metadata index"]
+        S --> C{"Eligible ranked skill found?"}
+        C -->|"Yes"| F["Fetch only the selected SKILL.md body"]
+        F --> X["Load selected skill into the active context"]
+        C -->|"No"| N["Continue without loading a specialist skill"]
+    end
+
+    A -->|"No"| N
+    X --> T["Agent continues the original task"]
+    N --> T
+    T --> E["Suggestion and fetch telemetry update deterministic ranking"]
 ```
 
 There is no user-facing skill browser or per-task selection prompt in the normal automatic-routing path. Search and fetch are internal agent operations exposed through MCP. The interactive shell, CLI, and HTTP API remain available for direct use, integration, administration, and observability.
