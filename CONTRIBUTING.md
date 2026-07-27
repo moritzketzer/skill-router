@@ -12,4 +12,4 @@ This project does not accept external pull requests at this time. Please do not 
 
 ## Security
 
-Please do not open public issues for security vulnerabilities. See SECURITY.md for reporting instructions.
+Please do not open public issues for security vulnerabilities; contact the maintainer directly instead.
