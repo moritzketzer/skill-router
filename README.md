@@ -1,6 +1,6 @@
 # Torafirma Skill Router
 
-> A local-first, single-binary router for discovering and loading large agent skill libraries without flooding the model context.
+> A local-first, single-binary auto-router for discovering and loading large agent skill libraries without flooding the model context.
 
 ![Platform](https://img.shields.io/badge/platform-Windows%20x64-0078D4)
 ![Language](https://img.shields.io/badge/C%2B%2B-20-00599C)
@@ -8,22 +8,26 @@
 ![SQLite](https://img.shields.io/badge/SQLite-3.53.4-003B57)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-Skill Router keeps one small interface skill in context and leaves the full skill library on disk. It indexes only metadata in SQLite, searches that compact index, and loads a full `SKILL.md` body only after a caller explicitly selects it.
+> **Automatic routing — no user interaction required:** once connected to an agent through MCP or the included interface skill, the agent invokes Skill Router when a task may benefit from specialized capability, searches the local index, selects and fetches the best-matching `SKILL.md`, and continues the task. The user does not browse the library, run searches, or choose a skill manually.
+
+Skill Router keeps one small interface skill in context and leaves the full skill library on disk. It indexes only metadata in SQLite. During normal agent use, the routing loop happens automatically: intent is converted into a bounded search, a ranked skill is selected, and only that skill's full body is loaded into context.
 
 ## Why it exists
 
 Large agent installations can contain hundreds or thousands of specialized skills. Injecting every skill description and body into every prompt is slow, expensive, and noisy. Skill Router reverses that model:
 
-1. Index skill metadata locally.
-2. Search by natural-language intent.
-3. Return a small ranked candidate list.
-4. Fetch only the chosen skill body.
-5. Track transparent usage telemetry to improve deterministic ranking.
+1. The user gives the agent a normal task — no routing command or skill name is required.
+2. The agent invokes the small `skill-router` interface automatically when specialized capability may help.
+3. Skill Router searches indexed metadata by natural-language intent.
+4. The agent selects a ranked candidate and fetches only that skill body.
+5. The agent continues the original task with the selected skill in context.
+6. Transparent usage telemetry improves deterministic ranking over time.
 
 Search output stays bounded by `--top`; it does not grow with the size of the library.
 
 ## Highlights
 
+- Automatic intent-to-skill routing with no user selection step
 - One portable Windows x64 executable
 - Local-first operation with no remote service dependency
 - SQLite FTS5 full-text search with Porter stemming
@@ -50,14 +54,50 @@ The executable is currently unsigned. Verify the ZIP digest before running it.
 
 ## Quick start
 
-Extract the archive into a writable directory, open PowerShell there, and add skills beneath `skill_library\`. Each skill directory needs a `SKILL.md` containing `name` and `description` frontmatter.
+Extract the archive into a writable directory and add skills beneath `skill_library\`. Each skill directory needs a `SKILL.md` containing `name` and `description` frontmatter.
+
+Index the library once:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\index-skills.ps1
+```
+
+Then connect `skillrouter.exe mcp` to the agent and keep only the included `skill-router` interface skill in the agent's always-loaded context. From that point, routing is automatic from the user's perspective: the user asks for the underlying task, and the agent performs search, selection, and fetch internally.
+
+```powershell
+.\skillrouter.exe mcp --db .\skill_index.db
+```
+
+The following CLI commands are optional manual diagnostics and smoke tests; users do not need to run them during normal agent operation:
+
+```powershell
 .\skillrouter.exe search "windows cpp build" --top 5 --json
 .\skillrouter.exe fetch skill-router
 .\skillrouter.exe stats
 ```
+
+## Automatic routing flow
+
+```text
+User task
+   |
+   v
+Agent recognizes that specialized capability may help
+   |
+   v
+skill-router interface invokes bounded metadata search
+   |
+   v
+Agent selects the best-ranked eligible skill
+   |
+   v
+Router fetches only that SKILL.md body
+   |
+   v
+Agent continues the original task
+```
+
+There is no user-facing skill browser or per-task selection prompt in the normal path. Search and fetch are internal agent operations exposed through MCP, CLI, or HTTP for integration and observability.
 
 ## Search modes
 
@@ -78,7 +118,7 @@ Skill Router can run as a newline-delimited JSON-RPC MCP server over stdio:
 .\skillrouter.exe mcp --db .\skill_index.db
 ```
 
-It exposes search, fetch, statistics, graveyard telemetry, and `skill://` resources. See the [integration manual](skill-router/INTEGRATION_MANUAL.md) for the complete protocol reference.
+It exposes search, fetch, statistics, graveyard telemetry, and `skill://` resources. In an agent integration, search and fetch are tool calls made internally by the agent; they are not steps the user must perform. See the [integration manual](skill-router/INTEGRATION_MANUAL.md) for the complete protocol reference.
 
 ## HTTP interface
 
