@@ -315,5 +315,5 @@ The MCP surface exposes:
 ```
 
 ## License
-
-MIT License. Copyright (c) 2026 Thomas Helm.
+MIT License. Copyright (c) 2026 Thomas Helm, Torafirma Systems Pty. Ltd. 
+This is an intentionally narrow demonstration of selected design patterns.
