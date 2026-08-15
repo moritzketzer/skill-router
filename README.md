@@ -315,5 +315,14 @@ The MCP surface exposes:
 ```
 
 ## License
-MIT License. Copyright (c) 2026 Thomas Helm, Torafirma Systems Pty. Ltd. 
-This is an intentionally narrow demonstration of selected design patterns.
+MIT License 2026
+
+## Expressionss of Interest
+
+**If you loved torafirma-skill-router and would like to discuss other ways Torafirma Systems
+could assist you & your business:**
+- Research Partnerships
+- Pilot Projects for **_Sentinel Pro Router_**
+- Talk to a Torafirma Systems Consultant 
+ 
+**please contact thomas.helm@torafirma.com or support@torafirma.com**
