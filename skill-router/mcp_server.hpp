@@ -16,6 +16,10 @@ namespace skilllib::mcp {
 inline constexpr const char* kProtocolVersion = "2024-11-05";
 inline constexpr const char* kServerName = "skillrouter";
 
+struct ServerOptions {
+  bool expose_resources = true;
+};
+
 struct JsonValue {
   enum class Type { Null, Bool, Num, Str, Arr, Obj };
   Type type = Type::Null;
@@ -397,7 +401,8 @@ inline std::string call_tool(SkillLibrary& lib, const std::string& name, const J
   }
 }
 
-inline std::optional<std::string> handle_request(SkillLibrary& lib, const std::string& line) {
+inline std::optional<std::string> handle_request(
+    SkillLibrary& lib, const std::string& line, const ServerOptions& options = {}) {
   JsonValue req;
   try { req = json_parse(line); }
   catch (const std::exception& e) { return rpc_error("null", -32700, std::string("parse error: ") + e.what()); }
@@ -419,7 +424,9 @@ inline std::optional<std::string> handle_request(SkillLibrary& lib, const std::s
   if (method == "initialize") {
     std::ostringstream o;
     o << "{\"protocolVersion\":\"" << kProtocolVersion
-      << "\",\"capabilities\":{\"tools\":{},\"resources\":{}},\"serverInfo\":{\"name\":\""
+      << "\",\"capabilities\":{\"tools\":{}";
+    if (options.expose_resources) o << ",\"resources\":{}";
+    o << "},\"serverInfo\":{\"name\":\""
       << kServerName << "\",\"version\":\"" << kEngineVersion << "\"}}";
     return rpc_result(id_json, o.str());
   }
@@ -432,6 +439,10 @@ inline std::optional<std::string> handle_request(SkillLibrary& lib, const std::s
     JsonValue empty_args; empty_args.type = JsonValue::Type::Obj;
     return rpc_result(id_json, call_tool(lib, name->str, args ? *args : empty_args));
   }
+  if (!options.expose_resources &&
+      (method == "resources/list" || method == "resources/templates/list" ||
+       method == "resources/read"))
+    return rpc_error(id_json, -32601, "method not found: " + method);
   if (method == "resources/list") return rpc_result(id_json, resources_list_json(lib));
   if (method == "resources/templates/list") return rpc_result(id_json, "{\"resourceTemplates\":[]}");
   if (method == "resources/read") {

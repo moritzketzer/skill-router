@@ -331,7 +331,7 @@ skillrouter graveyard                            [--min-searches N]
 skillrouter deprecate <skill_id>                 [--role operator]
 skillrouter archive <skill_id>                   [--role operator]
 skillrouter serve                                [--port 8090] [--role consumer|operator]
-skillrouter mcp                                  [--role consumer|operator]
+skillrouter mcp                                  [--role consumer|operator] [--tools-only]
 ```
 
 Defaults:
@@ -375,7 +375,8 @@ Start the stdio server:
 .\skillrouter.exe mcp `
   --db C:\absolute\skill_index.db `
   --telemetry-db C:\absolute\skill_telemetry.db `
-  --role consumer
+  --role consumer `
+  --tools-only
 ```
 
 ### `skill_search`
@@ -414,6 +415,11 @@ All three identity fields are mandatory.
 - `skill_graveyard`
 
 The MCP surface intentionally contains no catalogue-publication operations.
+
+`--tools-only` advertises only the tools capability. In that mode,
+`resources/list`, `resources/templates/list`, and `resources/read` return
+JSON-RPC method-not-found errors. Omit the flag for clients that use the
+resource interface below.
 
 ### MCP resources
 
@@ -504,7 +510,7 @@ This re-index is mandatory. It upgrades the indexed revision values and emits th
 
 ## 17. Validation
 
-The 1.1.0 suite contains 61 deterministic C++ tests covering:
+The 1.1.0 suite contains 64 deterministic C++ tests covering:
 
 - frontmatter and version handling;
 - SHA-256 vectors;
@@ -519,7 +525,7 @@ The 1.1.0 suite contains 61 deterministic C++ tests covering:
 - MCP tool and resource identity contracts;
 - malformed protocol and error paths.
 
-GitHub Actions builds the router, runs the 61-test C++ suite, and executes an end-to-end exact-fetch and eight-worker telemetry-concurrency smoke on Linux and Windows.
+GitHub Actions builds the router, runs the 64-test C++ suite, and executes an end-to-end exact-fetch and eight-worker telemetry-concurrency smoke on Linux and Windows.
 
 ## 18. Honest scope boundary
 

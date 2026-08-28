@@ -55,6 +55,7 @@ struct Args {
   int top = 8, port = 8090;
   long long min_searches = 5;
   bool include_archived = false;
+  bool tools_only = false;
 };
 
 Args parse(int argc, char** argv, int start) {
@@ -77,6 +78,7 @@ Args parse(int argc, char** argv, int start) {
     else if (s == "--catalog-generation") a.expected_catalog_generation = next("--catalog-generation");
     else if (s == "--min-searches") a.min_searches = std::stoll(next("--min-searches"));
     else if (s == "--include-archived") a.include_archived = true;
+    else if (s == "--tools-only") a.tools_only = true;
     else if (a.target.empty()) a.target = s;
     else { if (!a.query.empty()) a.query += ' '; a.query += s; }
   }
@@ -278,12 +280,14 @@ int cmd_mcp(const Args& a) {
   auto lib=make_library(a,true);
   std::cerr << "skillrouter MCP stdio v" << kEngineVersion << " catalog=" << a.db
             << " telemetry=" << lib->telemetry_path() << " access="
-            << (lib->catalog_read_only()?"read-only":"read-write") << "\n";
+            << (lib->catalog_read_only()?"read-only":"read-write") << " surface="
+            << (a.tools_only?"tools-only":"tools-and-resources") << "\n";
   std::string line;
   while (std::getline(std::cin,line)) {
     if (!line.empty()&&line.back()=='\r') line.pop_back();
     if (line.empty()) continue;
-    const auto response=mcp::handle_request(*lib,line);
+    const auto response=mcp::handle_request(
+        *lib,line,mcp::ServerOptions{.expose_resources=!a.tools_only});
     if (response) std::cout << *response << '\n' << std::flush;
   }
   return 0;
@@ -400,7 +404,7 @@ void usage() {
     << "  skillrouter fetch <skill_id>          --revision SHA256 --catalog-generation SHA256 [--db PATH]\n"
     << "  skillrouter stats|graveyard|use       [--db PATH] [--telemetry-db PATH]\n"
     << "  skillrouter deprecate|archive <id>    [--role operator]\n"
-    << "  skillrouter serve|mcp                 [--db PATH] [--telemetry-db PATH] [--role consumer|operator]\n"
+    << "  skillrouter serve|mcp                 [--db PATH] [--telemetry-db PATH] [--role consumer|operator] [--tools-only]\n"
     << "Consumer role is the default for search/fetch/stats/serve/mcp; operator role is required for publication and lifecycle writes.\n";
 }
 

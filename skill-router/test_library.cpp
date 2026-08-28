@@ -236,6 +236,20 @@ TEST(test_mcp_json_malformed) {
 TEST(test_mcp_initialize) {
   SkillLibrary lib(":memory:"); auto r=mcp::handle_request(lib,R"({"jsonrpc":"2.0","id":1,"method":"initialize"})"); assert(r&&r->find("\"version\":\"1.1.0\"")!=std::string::npos);
 }
+TEST(test_mcp_tools_only_omits_resources_capability) {
+  SkillLibrary lib(":memory:"); auto r=mcp::handle_request(lib,R"({"jsonrpc":"2.0","id":1,"method":"initialize"})",mcp::ServerOptions{.expose_resources=false}); assert(r&&r->find("\"resources\"")==std::string::npos);
+}
+TEST(test_mcp_tools_only_rejects_resource_methods) {
+  SkillLibrary lib(":memory:");
+  const mcp::ServerOptions options{.expose_resources=false};
+  for (const char* request : {
+      R"({"jsonrpc":"2.0","id":2,"method":"resources/list"})",
+      R"({"jsonrpc":"2.0","id":3,"method":"resources/templates/list"})",
+      R"({"jsonrpc":"2.0","id":4,"method":"resources/read","params":{"uri":"skill://m@sha256:deadbeef"}})"}) {
+    const auto r=mcp::handle_request(lib,request,options);
+    assert(r&&r->find("\"code\":-32601")!=std::string::npos);
+  }
+}
 TEST(test_mcp_tools_list_identity_contract) {
   SkillLibrary lib(":memory:"); auto r=mcp::handle_request(lib,R"({"jsonrpc":"2.0","id":1,"method":"tools/list"})"); assert(r&&r->find("expected_revision")!=std::string::npos&&r->find("catalog_generation")!=std::string::npos);
 }

@@ -40,7 +40,7 @@ Technical contracts:
 - Read-only consumer catalogue connections.
 - Separate writable telemetry database.
 - Operator-only registration, indexing, deprecation, and archival.
-- Revision-pinned MCP tools and resources.
+- Revision-pinned MCP tools and resources, with an optional tools-only surface.
 - Stable C ABI with explicit status and buffer ownership.
 - pybind11, N-API, and Rust bindgen binding scaffolds.
 - C++ contract tests and C ABI drift/fetch smoke tests.
@@ -255,18 +255,21 @@ $hit = (.\skillrouter.exe search "windows cpp build" `
 .\skillrouter.exe mcp `
   --db C:\absolute\skill_index.db `
   --telemetry-db C:\absolute\skill_telemetry.db `
-  --role consumer
+  --role consumer `
+  --tools-only
 ```
 
-The MCP surface exposes:
+The tools-only surface exposes:
 
 - `skill_search`;
 - `skill_fetch`;
 - `skill_stats`;
-- `skill_graveyard`;
-- revision-pinned `skill://` resources.
+- `skill_graveyard`.
 
 `skill_fetch` requires `skill_id`, `expected_revision`, and `catalog_generation`.
+With `--tools-only`, the server omits the MCP resources capability and rejects
+resource methods. Without the flag, the server also exposes revision-pinned
+`skill://` resources.
 
 ## Security posture
 
