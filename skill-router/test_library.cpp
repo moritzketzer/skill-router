@@ -239,6 +239,9 @@ TEST(test_mcp_initialize) {
 TEST(test_mcp_tools_list_identity_contract) {
   SkillLibrary lib(":memory:"); auto r=mcp::handle_request(lib,R"({"jsonrpc":"2.0","id":1,"method":"tools/list"})"); assert(r&&r->find("expected_revision")!=std::string::npos&&r->find("catalog_generation")!=std::string::npos);
 }
+TEST(test_mcp_tools_list_is_one_stdio_frame) {
+  SkillLibrary lib(":memory:"); auto r=mcp::handle_request(lib,R"({"jsonrpc":"2.0","id":1,"method":"tools/list"})"); assert(r&&r->find('\n')==std::string::npos&&r->find('\r')==std::string::npos);
+}
 TEST(test_mcp_search_returns_explanation) {
   auto d=dir("mcp_search"); SkillLibrary lib(":memory:"); lib.register_skill(write_skill(d,"m","mcp task")); auto r=mcp::handle_request(lib,R"({"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"skill_search","arguments":{"query":"mcp task"}}})"); assert(r&&r->find("score_components")!=std::string::npos&&r->find("revision_id")!=std::string::npos);
 }

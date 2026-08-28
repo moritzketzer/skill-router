@@ -250,12 +250,11 @@ inline std::string tool_text_result(const std::string& text, bool is_error = fal
 }
 
 inline std::string tools_list_json() {
-  return R"json({"tools":[
-{"name":"skill_search","title":"Search the skill library","description":"Search indexed skill metadata using the deterministic tf.skillrouter.hybrid-lexical.v1 ranking policy. Results include the score decomposition, immutable skill revision and catalog generation required for an exact fetch.","inputSchema":{"type":"object","properties":{"query":{"type":"string"},"top":{"type":"integer","minimum":1},"mode":{"type":"string","enum":["hybrid","exact","fts","fuzzy"]},"include_archived":{"type":"boolean"}},"required":["query"]}},
-{"name":"skill_fetch","title":"Fetch an exact skill revision","description":"Load the exact SKILL.md revision selected by skill_search. The router fails closed if the catalog generation or body revision changed between search and fetch. Loaded revisions are pinned in the caller context; there is no implicit hot reload.","inputSchema":{"type":"object","properties":{"skill_id":{"type":"string"},"expected_revision":{"type":"string"},"catalog_generation":{"type":"string"},"context":{"type":"string"}},"required":["skill_id","expected_revision","catalog_generation"]}},
-{"name":"skill_stats","title":"Skill library telemetry","description":"Return aggregate telemetry, catalog generation, ranking policy and lifecycle counts.","inputSchema":{"type":"object","properties":{}}},
-{"name":"skill_graveyard","title":"Low-value skill report","description":"Return skills frequently suggested but rarely fetched.","inputSchema":{"type":"object","properties":{"min_searches":{"type":"integer","minimum":0}}}}
-]})json";
+  return R"json({"tools":[)json"
+         R"json({"name":"skill_search","title":"Search the skill library","description":"Search indexed skill metadata using the deterministic tf.skillrouter.hybrid-lexical.v1 ranking policy. Results include the score decomposition, immutable skill revision and catalog generation required for an exact fetch.","inputSchema":{"type":"object","properties":{"query":{"type":"string"},"top":{"type":"integer","minimum":1},"mode":{"type":"string","enum":["hybrid","exact","fts","fuzzy"]},"include_archived":{"type":"boolean"}},"required":["query"]}},)json"
+         R"json({"name":"skill_fetch","title":"Fetch an exact skill revision","description":"Load the exact SKILL.md revision selected by skill_search. The router fails closed if the catalog generation or body revision changed between search and fetch. Loaded revisions are pinned in the caller context; there is no implicit hot reload.","inputSchema":{"type":"object","properties":{"skill_id":{"type":"string"},"expected_revision":{"type":"string"},"catalog_generation":{"type":"string"},"context":{"type":"string"}},"required":["skill_id","expected_revision","catalog_generation"]}},)json"
+         R"json({"name":"skill_stats","title":"Skill library telemetry","description":"Return aggregate telemetry, catalog generation, ranking policy and lifecycle counts.","inputSchema":{"type":"object","properties":{}}},)json"
+         R"json({"name":"skill_graveyard","title":"Low-value skill report","description":"Return skills frequently suggested but rarely fetched.","inputSchema":{"type":"object","properties":{"min_searches":{"type":"integer","minimum":0}}}}]})json";
 }
 
 inline std::string search_hit_json(const SearchHit& h) {
